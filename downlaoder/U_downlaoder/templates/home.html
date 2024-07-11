@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <style>
+        .center {
+            text-align: center;
+            margin-top: 15%;
+            width: 40%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        #label {
+            display: inline-block;
+            width: 150px;
+            height: 30px;
+            font-size: 20px;
+        }
+        #input {
+            width: 300px;
+            height: 30px;
+            font-size: 20px;
+        }
+        #downloadMessage {
+            margin-top: 20px;
+            font-size: 20px;
+        }
+        #popup {
+            display: none;
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+        #popup button {
+            margin-top: 10px;
+        }
+        #overlay {
+            display: none;
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 999;
+        }
+    </style>
+</head>
+<body>
+    <div class="center">
+        <form method="POST" id="downloadForm">
+            {% csrf_token %}
+            <label id="label" for="link">Enter Your Link:</label>
+            <input type="url" id="input" name="link" required>
+            <button type="submit">Submit</button>
+        </form>
+        
+        <div id="downloadMessage">
+            {% for message in messages %}
+                <p>{{ message }}</p>
+            {% endfor %}
+        </div>
+        
+        <div id="popup">
+            <p id="popupMessage"></p>
+            <button onclick="closePopup()">Close</button>
+        </div>
+        <div id="overlay"></div>
+    </div>
+
+    <script>
+        document.getElementById('downloadForm').addEventListener('submit', function() {
+            document.getElementById('downloadMessage').innerText = 'Downloading...';
+        });
+
+        // Check if there's a message to show in the popup
+        document.addEventListener('DOMContentLoaded', function() {
+            var messages = document.querySelectorAll('#downloadMessage p');
+            messages.forEach(function(message) {
+                var text = message.innerText;
+                if (text && !text.includes('Downloading...'))  {
+                    // Clear the downloading message before showing the complete message
+                    document.getElementById('downloadMessage').innerText = '';
+                    showPopup(text);
+                }
+            });
+        });
+
+        function showPopup(message) {
+            document.getElementById('popupMessage').innerText = message;
+            document.getElementById('popup').style.display = 'block';
+            document.getElementById('overlay').style.display = 'block';
+        }
+
+        function closePopup() {
+            document.getElementById('popup').style.display = 'none';
+            document.getElementById('overlay').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
